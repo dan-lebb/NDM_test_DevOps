@@ -1,0 +1,66 @@
+services:
+
+  nginx1:
+    image: nginx:latest
+    container_name: nginx1
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx1/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx-common.conf:/etc/nginx/nginx-common.conf
+    restart: always
+    networks:
+      proxy_net:
+        ipv4_address: 172.30.0.11
+
+  nginx2:
+    image: nginx:latest
+    container_name: nginx2
+    ports:
+      - "8082:80"
+    volumes:
+      - ./nginx2/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx-common.conf:/etc/nginx/nginx-common.conf
+    restart: always
+    networks:
+      proxy_net:
+        ipv4_address: 172.30.0.12
+
+  nginx3:
+    image: nginx:latest
+    container_name: nginx3
+    ports:
+      - "8083:80"
+    volumes:
+      - ./nginx3/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx-common.conf:/etc/nginx/nginx-common.conf
+    restart: always
+    networks:
+      proxy_net:
+        ipv4_address: 172.30.0.13
+
+  app:
+    image: python:3.12-slim
+    container_name: app
+
+    command: >
+      sh -c "
+      pip install flask &&
+      python /app/app.py
+      "
+
+    volumes:
+      - ./app:/app
+
+    networks:
+      proxy_net:
+        ipv4_address: 172.30.0.20
+
+networks:
+
+  proxy_net:
+
+    ipam:
+
+      config:
+        - subnet: 172.30.0.0/16
